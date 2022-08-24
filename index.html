@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Trivia</title>
+        <link rel="stylesheet" href="main.css">
+    </head>
+    <body>
+        <div>
+            <h3 id="category">Category</h3>
+            <h2 id="question">Question</h2>
+            <br>
+            <button class="blue" id="ans1" onClick="checkAnswer(0)">Answer 1</button><br>
+            <button class="green" id="ans2" onClick="checkAnswer(1)">Answer 2</button><br>
+            <button class="orange" id="ans3" onClick="checkAnswer(2)">Answer 3</button><br>
+            <button class="brown" id="ans4" onClick="checkAnswer(3)">Answer 4</button><br>
+            <br>
+            <button id="nextQ">Next Question</button>
+            <p id="response"></p>
+        </div>
+        
+    </body>
+</html>
+
+<script>
+    const category = document.querySelector("#category");
+    const question = document.querySelector("#question");
+    const response = document.querySelector("#response");
+    const nextQ = document.getElementById("nextQ");
+    const ans1 = document.querySelector("#ans1");
+    const ans2 = document.querySelector("#ans2");
+    const ans3 = document.querySelector("#ans3");
+    const ans4 = document.querySelector("#ans4");
+    var correctIdx = -1;
+
+    function checkAnswer(ansNum) {
+        if (correctIdx != -1) {
+            if (ansNum == correctIdx){
+                response.style.color = "green";
+                response.innerHTML = "Correct";
+            }
+            else {
+                response.style.color = "red";
+                response.innerHTML = "Incorrect";
+            }
+        }
+    }
+
+    nextQ.addEventListener("click", nextQuestion);
+        async function nextQuestion() {
+            response.innerHTML = "";
+
+            var requestOptions = {
+                method: 'GET',
+                redirect: 'follow'
+            };
+            let url = 'https://opentdb.com/api.php?amount=1&type=multiple';
+            fetch(url, requestOptions)
+                .then(response => response.json())
+                .then(result => {
+                    //console.log(result.results[0].category);
+                    //console.log(result.results[0].question);
+                    //console.log(result.results[0].correct_answer);
+                    //console.log(result.results[0].incorrect_answers);
+                    console.log(result.results[0]);
+                    
+                    category.innerHTML = result.results[0].category;
+                    question.innerHTML = result.results[0].question;
+                    const answers = [];
+                    correctIdx = Math.floor(Math.random() * 4);
+                    var incIdx = 0;
+                    for (let i = 0; i < 4; i++) {
+                        if (i == correctIdx) {
+                            answers[i] = result.results[0].correct_answer;
+                        }
+                        else {
+                            answers[i] = result.results[0].incorrect_answers[incIdx];
+                            incIdx++;
+                        }
+                    }
+
+                    ans1.innerHTML = answers[0];
+                    ans2.innerHTML = answers[1];
+                    ans3.innerHTML = answers[2];
+                    ans4.innerHTML = answers[3];
+                })
+                .catch(error => console.log('error', error));
+        }
+
+
+</script>
